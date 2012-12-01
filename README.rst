@@ -105,10 +105,11 @@ The following invocation of ``make`` works around this issue::
 Notes on Debian and Ubuntu Builds
 ---------------------------------
 
-The `Makefile` also as a target for Debian, it depends on `debhelper` and
-`postgresql-server-dev-all`. Install both of them then `make deb` to build the
-Debian packages for all your postgresql source installation
-(`postgresql-server-dev-9.2` for example)::
+The Makefile also provides a target for building Debian packages. The target has
+a dependency on ``debhelper`` and ``postgresql-server-dev-all``, and the
+PostgreSQL source package itself (e.g. ``postgresql-server-dev-9.2``).
+
+The packages can be created and installed as follows::
 
   sudo aptitude install debhelper postgresql-server-dev-all
   make deb
@@ -177,9 +178,11 @@ plan executed).
 +---------------------+------------------+---------------------------------------------------------------------+
 | query               | text             | Text of the first statement (up to plans_query_size bytes)          |
 +---------------------+------------------+---------------------------------------------------------------------+
-| had_our_search_path | boolean          | indicates if query strings execution's search_path matches current  |
+| had_our_search_path | boolean          | Indicates if query strings execution's search_path matches current  |
 +---------------------+------------------+---------------------------------------------------------------------+
-| query_valid         | boolean          | indicates if query column text now produces same plan               |
+| from_our_database   | boolean          | Indicates if the entry originated from the current database         |
++---------------------+------------------+---------------------------------------------------------------------+
+| query_valid         | boolean          | Indicates if query column text now produces same plan               |
 +---------------------+------------------+---------------------------------------------------------------------+
 | calls               | bigint           | Number of times executed                                            |
 +---------------------+------------------+---------------------------------------------------------------------+
@@ -260,7 +263,7 @@ Usage example::
 
   postgres=# select pg_stat_plans_explain(planid, userid, dbid),
       planid, last_startup_cost, last_total_cost from pg_stat_plans
-      where planid = 2721250187;
+      where from_our_database and planid = 2721250187;
   -[ RECORD 1 ]---------+--------------------------------------------------
   pg_stat_plans_explain | Result  (cost=0.00..0.01 rows=1 width=0)
   planid                | 2721250187
@@ -312,28 +315,28 @@ pg_stat_plans_queries view
 --------------------------
 
 A variant of the regular pg_stat_plans view that summarises the statistics at
-the query granularity. Regular expression query text normalisation, with all of
+the query granularity. Regular expression query text normalization, with all of
 the attendant limitations is used.
 
 Most columns are essentially equivalent to and directly derived from a
 pg_stat_plans column, and as such are not described separately. Some of the
-views' columns, whose broad purpose is to faciliate finding outlier plans, are
+views' columns, whose broad purpose is to facilitate finding outlier plans, are
 described below:
 
 +---------------------+-----------+---------------------------------------------------------------+
 | Name                | Type      | Description                                                   |
 +=====================+===========+===============================================================+
-| planids             | oid[]     | planids for all plans of the statement                        |
+| plan_ids            | oid[]     | planids for all plans of the statement                        |
 +---------------------+-----------+---------------------------------------------------------------+
-| calls_histogram     | integer[] | Corresponding calls for each plan                             |
+| calls_per_plan      | integer[] | Corresponding calls for each plan                             |
 +---------------------+-----------+---------------------------------------------------------------+
-| avg_time_historam   | integer[] | Corresponding average time (in milliseconds) for each plan    |
+| avg_time_per_plan   | integer[] | Corresponding average time (in milliseconds) for each plan    |
 +---------------------+-----------+---------------------------------------------------------------+
-| normalized_query    | text      | Query text, normalised with simple regular expression method. |
+| normalized_query    | text      | Query text, normalized with simple regular expression method  |
 +---------------------+-----------+---------------------------------------------------------------+
-| time_variance       | double    | Variance in average execution times for each plan.            |
+| time_variance       | double    | Variance in average execution times for each plan             |
 +---------------------+-----------+---------------------------------------------------------------+
-| time_stddev         | double    | Stddev of average execution times for each plan.              |
+| time_stddev         | double    | Stddev of average execution times for each plan               |
 +---------------------+-----------+---------------------------------------------------------------+
 
 Note that because ``pg_stat_plans_queries`` is defined in terms of

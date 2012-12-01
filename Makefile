@@ -1,9 +1,10 @@
 EXTENSION    = pg_stat_plans
 EXTVERSION   = 1.0
 EXTCOMMENT   = Monitors execution costs of plans
+MODULEDIR    = pg_stat_plans
 
 MODULES      = $(EXTENSION)
-DOCS         = README.pg_stat_plans.rst
+DOCS         = README.rst
 
 PG_CONFIG    = pg_config
 BUILD_EXTENSION = $(shell $(PG_CONFIG) --version | grep -qE "8\.|9\.0" && echo no || echo yes)
