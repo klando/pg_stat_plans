@@ -3,3 +3,4 @@ comment = 'EXTCOMMENT'
 default_version = 'EXTVERSION'
 module_pathname = '$libdir/EXTENSION'
 relocatable = true
+directory = pg_stat_plans
